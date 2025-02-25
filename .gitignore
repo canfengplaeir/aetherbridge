@@ -1,0 +1,69 @@
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+gradle-app.setting
+
+# eclipse
+
+*.launch
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+out/
+
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# macos
+
+*.DS_Store
+
+# fabric
+
+run/
+logs/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+# windows
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# linux
+
+*~
+
+# project specific files
+config/aetherbridge/
+
+# log files
+*.log
+*.log.gz
+*.log.lck
+
+# node.js (middleware service)
+mc-bridge-server/node_modules/
+mc-bridge-server/logs/
+mc-bridge-server/.env.local
+
+.env

@@ -1,0 +1,17 @@
+{
+    // API配置
+    "apiUrl": "https://your-api.com/endpoint",
+    "apiKey": "your-secret-key",
+    "listenPort": 8080,
+    
+    // 功能开关
+    "features": {
+        "messageSender": true,
+        "messageReceiver": true
+    },
+    
+    // 安全配置
+    "allowedIps": [
+        "127.0.0.1"
+    ]
+} 

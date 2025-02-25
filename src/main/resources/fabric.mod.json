@@ -1,0 +1,43 @@
+{
+	"schemaVersion": 1,
+	"id": "aetherbridge",
+	"version": "${version}",
+	"name": "AetherBridge",
+	"description": "一个用于连接Minecraft服务器与外部服务的消息桥接模组，支持双向实时通信、消息前缀、IPv6等功能",
+	"authors": [
+		"DevCL"
+	],
+	"contact": {
+		"homepage": "https://github.com/DevCL/aetherbridge",
+		"sources": "https://github.com/DevCL/aetherbridge",
+		"issues": "https://github.com/DevCL/aetherbridge/issues"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/aetherbridge/icon.png",
+	"environment": "server",
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/your-discord",
+				"modmenu.wiki": "https://github.com/DevCL/aetherbridge/wiki"
+			}
+		}
+	},
+	"entrypoints": {
+		"main": [
+			"com.devcl.aetherbridge.AetherBridge"
+		]
+	},
+	"mixins": [
+		"aetherbridge.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": ">=7.0.0"
+	}
+}
