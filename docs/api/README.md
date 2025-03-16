@@ -46,14 +46,18 @@ Authorization: Bearer your-api-key
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| player | string | 是 | 发送消息的玩家名称 |
+| playerId | string | 否 | 发送消息的玩家UUID |
+| playerName | string | 是 | 发送消息的玩家名称 |
 | message | string | 是 | 聊天消息内容 |
+| prefix | string | 否 | 消息前缀，默认为配置中的defaultChatPrefix |
 
 #### 请求体
 ```json
 {
-    "player": "玩家名称",
-    "message": "聊天消息内容"
+    "playerId": "12345678-1234-1234-1234-123456789abc",
+    "playerName": "玩家名称",
+    "message": "聊天消息内容",
+    "prefix": "MC"
 }
 ```
 
@@ -62,7 +66,8 @@ Authorization: Bearer your-api-key
 {
     "success": true,
     "received": {
-        "player": "玩家名称",
+        "playerId": "12345678-1234-1234-1234-123456789abc",
+        "playerName": "玩家名称",
         "message": "聊天消息内容",
         "time": "2024-01-01T12:00:00Z"
     }

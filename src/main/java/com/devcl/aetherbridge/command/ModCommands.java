@@ -24,6 +24,9 @@ public class ModCommands {
             .then(literal("reload")
                 .executes(ModCommands::reloadConfig)
             )
+            .then(literal("hotreload")
+                .executes(ModCommands::hotReload)
+            )
             .then(literal("info")
                 .executes(ModCommands::showInfo)
             )
@@ -118,6 +121,26 @@ public class ModCommands {
         }
     }
 
+    private static int hotReload(CommandContext<ServerCommandSource> context) {
+        try {
+            context.getSource().sendFeedback(() -> Text.literal("§6正在执行热重载，请稍候..."), true);
+            
+            // 重新加载配置
+            ModConfig.loadConfig();
+            
+            // 执行热重载
+            FeatureManager manager = FeatureManager.getInstance(context.getSource().getServer());
+            manager.hotReload();
+            
+            context.getSource().sendFeedback(() -> Text.literal("§a热重载完成！所有功能已重新初始化"), true);
+            return 1;
+        } catch (Exception e) {
+            AetherBridge.LOGGER.error("执行热重载失败", e);
+            context.getSource().sendError(Text.literal("§c执行热重载失败: " + e.getMessage()));
+            return 0;
+        }
+    }
+
     private static int enableFeature(CommandContext<ServerCommandSource> context) {
         String featureId = StringArgumentType.getString(context, "featureId");
         try {
@@ -188,6 +211,7 @@ public class ModCommands {
             message.append("\n§6提示:§r\n")
                 .append("§7- 功能状态会保存到配置文件\n")
                 .append("§7- 使用 /aetherbridge reload 重新加载配置\n")
+                .append("§7- 使用 /aetherbridge hotreload 执行完整热重载\n")
                 .append("§7- 使用 /aetherbridge info 查看详细配置\n");
             
             context.getSource().sendFeedback(() -> message, false);

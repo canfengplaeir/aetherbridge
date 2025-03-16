@@ -14,6 +14,7 @@ config/aetherbridge/config.json
     "apiUrl": "http://localhost:3000/api/mc-message",  // API服务器地址
     "apiKey": "your-secret-key",                       // API密钥
     "listenPort": 8080,                                // HTTP服务器监听端口
+    "defaultChatPrefix": "MC",                         // 默认聊天消息前缀
     "features": {
         "messageSender": true,                         // 消息发送功能开关
         "messageReceiver": true                        // 消息接收功能开关
@@ -28,6 +29,7 @@ config/aetherbridge/config.json
     "apiUrl": "https://api.example.com/mc-message",
     "apiKey": "your-secret-key",
     "listenPort": 8080,
+    "defaultChatPrefix": "MC",
     "features": {
         "messageSender": true,
         "messageReceiver": true
@@ -42,6 +44,11 @@ config/aetherbridge/config.json
             "127.0.0.1",
             "192.168.1.0/24"
         ]
+    },
+    "logging": {
+        "level": "INFO",            // 日志级别：DEBUG, INFO, WARN, ERROR
+        "includePlayerIds": true,   // 是否在日志中包含玩家ID
+        "logRequests": true         // 是否记录完整的请求和响应
     }
 }
 ```
@@ -59,7 +66,8 @@ config/aetherbridge/config.json
         "messageSender": {
             "enabled": true,
             "prefix": "MC",
-            "excludeCommands": true
+            "excludeCommands": true,
+            "includePlayerIds": true    // 是否包含玩家UUID
         }
     }
 }
@@ -81,6 +89,34 @@ config/aetherbridge/config.json
     }
 }
 ```
+
+## 日志配置
+
+可以通过配置文件控制日志的详细程度：
+
+```json
+{
+    "logging": {
+        "level": "INFO",            // 日志级别：DEBUG, INFO, WARN, ERROR
+        "file": {
+            "enabled": true,        // 是否启用文件日志
+            "path": "logs/aetherbridge.log",
+            "maxSize": 10           // 单位：MB
+        },
+        "console": {
+            "enabled": true,        // 是否启用控制台日志
+            "colorized": true       // 是否启用彩色日志
+        }
+    }
+}
+```
+
+### 日志级别说明
+
+- DEBUG: 最详细的日志，包含所有调试信息
+- INFO: 标准信息日志，包含主要操作和状态
+- WARN: 警告信息，可能的问题但不影响核心功能
+- ERROR: 错误信息，影响功能正常运行的问题
 
 ## 配置热重载
 

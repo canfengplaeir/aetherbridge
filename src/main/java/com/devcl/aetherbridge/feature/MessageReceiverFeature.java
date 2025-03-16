@@ -28,18 +28,24 @@ public class MessageReceiverFeature implements Feature {
     @Override
     public void enable() throws Exception {
         if (!enabled) {
+            AetherBridge.LOGGER.info("正在启用消息接收功能...");
             startHttpServer();
             enabled = true;
-            AetherBridge.LOGGER.info("消息接收功能已启用");
+            AetherBridge.LOGGER.info("消息接收功能已启用，监听端口: " + ModConfig.getInstance().getListenPort());
+        } else {
+            AetherBridge.LOGGER.debug("消息接收功能已经处于启用状态");
         }
     }
 
     @Override
     public void disable() throws Exception {
         if (enabled) {
+            AetherBridge.LOGGER.info("正在禁用消息接收功能...");
             stopHttpServer();
             enabled = false;
             AetherBridge.LOGGER.info("消息接收功能已禁用");
+        } else {
+            AetherBridge.LOGGER.debug("消息接收功能已经处于禁用状态");
         }
     }
 
@@ -62,6 +68,9 @@ public class MessageReceiverFeature implements Feature {
 
             // 添加CORS支持
             httpServer.createContext("/", exchange -> {
+                String remoteAddr = exchange.getRemoteAddress().getAddress().getHostAddress();
+                AetherBridge.LOGGER.debug("收到来自 " + remoteAddr + " 的请求: " + exchange.getRequestMethod() + " " + exchange.getRequestURI());
+                
                 exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -75,7 +84,12 @@ public class MessageReceiverFeature implements Feature {
             });
 
             httpServer.createContext("/api/send-to-mc", exchange -> {
+                String remoteAddr = exchange.getRemoteAddress().getAddress().getHostAddress();
+                AetherBridge.LOGGER.info("收到来自 " + remoteAddr + " 的消息发送请求: " + 
+                                      exchange.getRequestMethod() + " " + exchange.getRequestURI());
+                
                 if (!enabled) {
+                    AetherBridge.LOGGER.warn("功能已禁用，拒绝请求");
                     exchange.sendResponseHeaders(503, -1);
                     exchange.close();
                     return;
@@ -96,6 +110,7 @@ public class MessageReceiverFeature implements Feature {
                 String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                 if (authHeader == null || !authHeader.startsWith("Bearer ") || 
                     !authHeader.substring(7).equals(ModConfig.getInstance().getApiKey())) {
+                    AetherBridge.LOGGER.warn("API密钥验证失败，来自: " + remoteAddr);
                     exchange.sendResponseHeaders(403, 0);
                     exchange.close();
                     return;
@@ -104,11 +119,15 @@ public class MessageReceiverFeature implements Feature {
                 // 读取请求体
                 try (InputStream is = exchange.getRequestBody()) {
                     String requestBody = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                    AetherBridge.LOGGER.debug("收到请求体: " + requestBody);
+                    
                     JsonObject json = GSON.fromJson(requestBody, JsonObject.class);
                     
                     if (json.has("message")) {
                         String message = json.get("message").getAsString();
                         String prefix = json.has("prefix") ? json.get("prefix").getAsString() : null;
+                        
+                        AetherBridge.LOGGER.info("收到消息: " + message + (prefix != null ? ", 前缀: " + prefix : ""));
                         
                         // 构建完整消息
                         String fullMessage = prefix != null ? String.format("[%s] %s", prefix, message) : message;
@@ -121,7 +140,10 @@ public class MessageReceiverFeature implements Feature {
                         exchange.getResponseHeaders().set("Content-Type", "application/json");
                         exchange.sendResponseHeaders(200, response.length());
                         exchange.getResponseBody().write(response.getBytes());
+                        
+                        AetherBridge.LOGGER.debug("消息处理成功");
                     } else {
+                        AetherBridge.LOGGER.warn("请求缺少message字段");
                         String error = "{\"error\":\"missing message field\"}";
                         exchange.getResponseHeaders().set("Content-Type", "application/json");
                         exchange.sendResponseHeaders(400, error.length());
@@ -187,13 +209,17 @@ public class MessageReceiverFeature implements Feature {
             return;
         }
         
+        AetherBridge.LOGGER.info("准备广播消息到服务器: " + message);
+        
         // 确保在主线程中执行
         server.execute(() -> {
             try {
+                AetherBridge.LOGGER.debug("在主线程中广播消息");
                 server.getPlayerManager().broadcast(
                     Text.literal(message),
                     false
                 );
+                AetherBridge.LOGGER.debug("消息广播成功");
             } catch (Exception e) {
                 AetherBridge.LOGGER.error("广播消息时发生错误", e);
             }

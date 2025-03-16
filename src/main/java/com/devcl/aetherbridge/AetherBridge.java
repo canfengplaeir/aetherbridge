@@ -8,6 +8,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
 import com.devcl.aetherbridge.command.ModCommands;
 import com.devcl.aetherbridge.feature.FeatureManager;
+import com.devcl.aetherbridge.network.MessageSender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,8 @@ public class AetherBridge implements ModInitializer {
 			if (featureManager != null) {
 				featureManager.shutdown();
 			}
+			// 关闭消息发送线程池
+			MessageSender.shutdown();
 		});
 		
 		LOGGER.info("AetherBridge初始化完成！");

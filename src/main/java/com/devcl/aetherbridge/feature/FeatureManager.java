@@ -2,6 +2,7 @@ package com.devcl.aetherbridge.feature;
 
 import com.devcl.aetherbridge.AetherBridge;
 import com.devcl.aetherbridge.config.ModConfig;
+import com.devcl.aetherbridge.network.MessageSender;
 import net.minecraft.server.MinecraftServer;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +76,31 @@ public class FeatureManager {
             status.append(String.format("- %s: %s\n", id, feature.isEnabled() ? "启用" : "禁用"));
         });
         AetherBridge.LOGGER.info(status.toString());
+    }
+    
+    /**
+     * 热重载所有功能
+     * 这个方法会先禁用所有功能，然后重新注册并启用它们
+     */
+    public void hotReload() {
+        AetherBridge.LOGGER.info("正在执行热重载...");
+        
+        // 先禁用所有功能
+        shutdown();
+        
+        // 关闭消息发送线程池
+        MessageSender.shutdown();
+        
+        // 清空功能列表
+        features.clear();
+        
+        // 重新注册功能
+        registerFeatures();
+        
+        // 根据配置重新加载功能
+        reloadFeatures();
+        
+        AetherBridge.LOGGER.info("热重载完成");
     }
 
     public void shutdown() {
